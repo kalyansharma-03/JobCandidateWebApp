@@ -9,6 +9,7 @@ namespace JobCandidate.Infrastructure.Service
 {
     public interface IJobCondidateService
     {
+        Task<EJobCandidateDetails> IsExistingEmail(string email);
         Task<bool> AddJobCandidateDetails(EJobCandidateDetails model);
         Task<bool> UpdateJobCandidateDetails(EJobCandidateDetails model);
     }

@@ -23,6 +23,13 @@ namespace JobCandidate.Infrastructure.Service
             return true;
         }
 
+        public async Task<EJobCandidateDetails> IsExistingEmail(string email)
+        {
+            var service = _factory.GetInstance<EJobCandidateDetails>();
+            var result = await service.FindAsync(email);
+            return result;
+        }
+
         public async Task<bool> UpdateJobCandidateDetails(EJobCandidateDetails model)
         {
             var service = _factory.GetInstance<EJobCandidateDetails>();

@@ -2,6 +2,7 @@
 using JobCandidate.Application.Manager.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace JobCandidate.Application
 {

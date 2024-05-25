@@ -16,14 +16,11 @@ namespace JobCandidate.UnitTest.Manager
     public class JobCandidateManagerTest
     {
         private readonly Mock<IJobCondidateService> _jobCondidateService = new Mock<IJobCondidateService>();
-        private readonly Mock<IConnectionMultiplexer> _database = new Mock<IConnectionMultiplexer>();
-        private readonly Mock<IDatabase> _redisDb = new Mock<IDatabase>();
         private readonly JobCandidateManager _manager;
 
         public JobCandidateManagerTest()
         {
-            _database.Setup(x => x.GetDatabase(It.IsAny<int>(), It.IsAny<object>())).Returns(_redisDb.Object);
-            _manager = new JobCandidateManager(_jobCondidateService.Object, _database.Object);
+            _manager = new JobCandidateManager(_jobCondidateService.Object);
         }
         [Fact]
         public async Task AddJobCandidateDetails_OnSuccess_Returns200()
@@ -38,14 +35,6 @@ namespace JobCandidate.UnitTest.Manager
             };
 
             _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email));
-            _redisDb.Setup(x => x.StringSetAsync(
-              It.IsAny<RedisKey>(),
-              It.IsAny<RedisValue>(),
-              It.IsAny<TimeSpan?>(),
-              It.IsAny<bool>(),
-              It.IsAny<When>(),
-              It.IsAny<CommandFlags>()
-          )).ReturnsAsync(true);
             _jobCondidateService.Setup(x => x.AddJobCandidateDetails(model)).ReturnsAsync(true);
 
             //act
@@ -67,14 +56,6 @@ namespace JobCandidate.UnitTest.Manager
             };
 
             _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email)).ReturnsAsync(model);
-            _redisDb.Setup(x => x.StringSetAsync(
-              It.IsAny<RedisKey>(),
-              It.IsAny<RedisValue>(),
-              It.IsAny<TimeSpan?>(),
-              It.IsAny<bool>(),
-              It.IsAny<When>(),
-              It.IsAny<CommandFlags>()
-          )).ReturnsAsync(true);
             _jobCondidateService.Setup(x => x.UpdateJobCandidateDetails(model)).ReturnsAsync(true);
 
             //act

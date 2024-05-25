@@ -16,9 +16,14 @@ namespace JobCandidateWebApp.Controllers
             _manager = manager;
         }
         [HttpPost("AddUpdateJobCandidateDetails")]
-        public async Task<Response> AddUpdateJobCandidateDetails(CandidateDetailsRequest model)
+        public async Task<IActionResult> AddUpdateJobCandidateDetails(CandidateDetailsRequest model)
         {
-            return await _manager.AddUpdateJobCandidateDetails(model);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response= await _manager.AddUpdateJobCandidateDetails(model);
+            return Ok(response);
         }
     }
 }

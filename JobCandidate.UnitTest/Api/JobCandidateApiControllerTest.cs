@@ -2,6 +2,7 @@
 using JobCandidate.Application.Manager.Interface;
 using JobCandidate.UnitTest.Data;
 using JobCandidateWebApp.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -26,21 +27,24 @@ namespace JobCandidate.UnitTest.Api
         {
             JobCandidateDataInfo.Init();
 
-            //arrange
+            // Arrange
             var request = JobCandidateDataInfo.CandidateDetailsAddRequest;
             var expected_result = new Response()
-            { 
-                Message= "Added job candidate details successfully",
-                Status=StatusType.Success
+            {
+                Message = "Added job candidate details successfully",
+                Status = StatusType.Success
             };
 
             _manager.Setup(x => x.AddUpdateJobCandidateDetails(request)).ReturnsAsync(expected_result);
 
-            //act
-            var result = await _controller.AddUpdateJobCandidateDetails(request);
+            // Act
+            var result = await _controller.AddUpdateJobCandidateDetails(request) as OkObjectResult;
+            var actual_result = result.Value as Response;
 
-            //assert
-            Assert.Equivalent(expected_result, result);
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotNull(actual_result);
+            Assert.Equal(expected_result, actual_result);
         }
     }
 }

@@ -17,11 +17,9 @@ namespace JobCandidate.Application.Manager.Implementation
 
     {
         private readonly IJobCondidateService _service;
-        private readonly IDatabase _cache;
-        public JobCandidateManager(IJobCondidateService service,IConnectionMultiplexer redis)
+        public JobCandidateManager(IJobCondidateService service)
         {
             _service = service;
-            _cache = redis.GetDatabase();
         }
 
         public async Task<Response> AddUpdateJobCandidateDetails(CandidateDetailsRequest model)
@@ -36,8 +34,6 @@ namespace JobCandidate.Application.Manager.Implementation
                         Status = StatusType.Failure
                     };
                 }
-                //setting cache key as email
-                var cacheKey = $"JobCandidate:{model.Email}";
                 var entity = new EJobCandidateDetails()
                 {
                     Email = model.Email,
@@ -53,8 +49,6 @@ namespace JobCandidate.Application.Manager.Implementation
                 if (existingEmail is null)
                 {
                     await _service.AddJobCandidateDetails(entity);
-                    //serialize the model and store it in redis under the key :email
-                    await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(entity)); 
                     return new Response()
                     {
                         Message = "Added job candidate details successfully",
@@ -62,8 +56,6 @@ namespace JobCandidate.Application.Manager.Implementation
                     };
                 }
                 await _service.UpdateJobCandidateDetails(entity);
-                //serialize the model and store it in redis under the key :email
-                await _cache.StringSetAsync(cacheKey, JsonSerializer.Serialize(entity));
                 return new Response()
                 {
                     Message = "Updated job candidate details successfully",

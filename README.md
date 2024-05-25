@@ -41,8 +41,8 @@ This .NET-based job candidate hub application is designed to add or update job c
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-repo/job-candidate-management.git
-   cd job-candidate-management
+   https://github.com/kalyansharma-03/JobCandidateWebApp.git
+   cd JobCandidateWebApp
 
 2. Change the database configuration
 

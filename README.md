@@ -47,9 +47,13 @@ This .NET-based job candidate hub application is designed to add or update job c
 
    
 {
+
   "ConnectionStrings": {
+  
     "DefaultConnection": "YourDatabaseConnectionString"
+    
   }
+  
 }
 
 3.Add migration to setup the database schema
@@ -57,4 +61,6 @@ This .NET-based job candidate hub application is designed to add or update job c
 4.Build and run
 
 5.Testing the API
+
 Use a tool like Postman or Swagger to test the API endpoint.
+

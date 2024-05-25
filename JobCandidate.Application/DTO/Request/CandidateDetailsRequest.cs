@@ -20,7 +20,9 @@ namespace JobCandidate.Application.DTO.Request
         public string? PhoneNumber { get; set; }
         public TimeSpan? TimeIntervalStart { get; set; }
         public TimeSpan? TimeIntervalEnd { get; set; }
+        [Url(ErrorMessage = "Enter a valid LinkedIn profile URL")]
         public string? LinkedInProfileUrl { get; set; }
+        [Url(ErrorMessage = "Enter a valid GitHub profile URL")]
         public string? GithubProfileUrl { get; set; }
         [Required(ErrorMessage = "Enter comment")]
         public string FreeTextComment { get; set; }

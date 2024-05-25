@@ -3,6 +3,7 @@ using JobCandidate.Application.Manager.Implementation;
 using JobCandidate.Infrastructure.Service;
 using JobCandidate.UnitTest.Data;
 using Moq;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +15,15 @@ namespace JobCandidate.UnitTest.Manager
 {
     public class JobCandidateManagerTest
     {
-        private readonly JobCandidateManager _manager;
         private readonly Mock<IJobCondidateService> _jobCondidateService = new Mock<IJobCondidateService>();
+        private readonly Mock<IConnectionMultiplexer> _database = new Mock<IConnectionMultiplexer>();
+        private readonly Mock<IDatabase> _redisDb = new Mock<IDatabase>();
+        private readonly JobCandidateManager _manager;
 
         public JobCandidateManagerTest()
         {
-            _manager = new JobCandidateManager(_jobCondidateService.Object);
+            _database.Setup(x => x.GetDatabase(It.IsAny<int>(), It.IsAny<object>())).Returns(_redisDb.Object);
+            _manager = new JobCandidateManager(_jobCondidateService.Object, _database.Object);
         }
         [Fact]
         public async Task AddJobCandidateDetails_OnSuccess_Returns200()
@@ -34,6 +38,14 @@ namespace JobCandidate.UnitTest.Manager
             };
 
             _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email));
+            _redisDb.Setup(x => x.StringSetAsync(
+              It.IsAny<RedisKey>(),
+              It.IsAny<RedisValue>(),
+              It.IsAny<TimeSpan?>(),
+              It.IsAny<bool>(),
+              It.IsAny<When>(),
+              It.IsAny<CommandFlags>()
+          )).ReturnsAsync(true);
             _jobCondidateService.Setup(x => x.AddJobCandidateDetails(model)).ReturnsAsync(true);
 
             //act
@@ -55,6 +67,14 @@ namespace JobCandidate.UnitTest.Manager
             };
 
             _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email)).ReturnsAsync(model);
+            _redisDb.Setup(x => x.StringSetAsync(
+              It.IsAny<RedisKey>(),
+              It.IsAny<RedisValue>(),
+              It.IsAny<TimeSpan?>(),
+              It.IsAny<bool>(),
+              It.IsAny<When>(),
+              It.IsAny<CommandFlags>()
+          )).ReturnsAsync(true);
             _jobCondidateService.Setup(x => x.UpdateJobCandidateDetails(model)).ReturnsAsync(true);
 
             //act
@@ -62,6 +82,47 @@ namespace JobCandidate.UnitTest.Manager
 
             //assert
             Assert.Equivalent(expected_result, result);
+        }
+        [Fact]
+        public async Task AddUpdateJobCandidateDetails_OnNullModel_Returns400()
+        {
+            JobCandidateDataInfo.Init();
+            var model = JobCandidateDataInfo.EJobCandidateDetails;
+            var expected_result = new Response()
+            {
+                Message = "Invalid candidate details",
+                Status = StatusType.Failure
+            };
+
+            _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email)).ReturnsAsync(model);
+            _jobCondidateService.Setup(x => x.UpdateJobCandidateDetails(model)).ReturnsAsync(true);
+
+            //act
+            var result = await _manager.AddUpdateJobCandidateDetails(null);
+
+            //assert
+            Assert.Equivalent(expected_result, result);
+        }
+        [Fact]
+        public async Task AddUpdateJobCandidateDetails_OnException_Returns500UnhandledException()
+        {
+            JobCandidateDataInfo.Init();
+            var addRequest = JobCandidateDataInfo.CandidateDetailsUpdateRequest;
+            var model = JobCandidateDataInfo.EJobCandidateDetails;
+            var expected_result = new Response()
+            {
+                Message = "Something went wrong",
+                Status = StatusType.UnHandledException
+            };
+
+            _jobCondidateService.Setup(x => x.IsExistingEmail(model.Email)).ThrowsAsync(new Exception("Simulated exception"));
+            _jobCondidateService.Setup(x => x.UpdateJobCandidateDetails(model)).ReturnsAsync(true);
+
+            //act
+            var result = await _manager.AddUpdateJobCandidateDetails(addRequest);
+
+            //assert
+            Assert.Equivalent(expected_result.Status, result.Status);
         }
     }
 }

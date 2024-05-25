@@ -15,6 +15,7 @@ namespace JobCandidate.Application.DTO.Response
     public enum StatusType
     {
         Success=200,
-        Failure=400
+        Failure=400,
+        UnHandledException=500
     }
 }

@@ -34,6 +34,7 @@ This .NET-based job candidate hub application is designed to add or update job c
 ### Prerequisites
 
 - .NET 6 SDK or later
+- PostgreSQL database
 
 ### Installation
 
@@ -45,12 +46,13 @@ This .NET-based job candidate hub application is designed to add or update job c
 
 2. Change the database configuration
 
+Change the configuration in the appsettings.json file to your database configuration
    
 {
 
   "ConnectionStrings": {
   
-    "DefaultConnection": "YourDatabaseConnectionString"
+    "DbContext": "YourDatabaseConnectionString"
     
   }
   

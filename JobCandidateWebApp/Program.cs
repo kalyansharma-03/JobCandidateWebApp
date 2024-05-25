@@ -17,12 +17,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // Use default naming policy
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    // Other Swagger configuration...
-
     options.MapType<TimeSpan?>(() => new OpenApiSchema { Type = "string", Format = "hh:mm:ss", Nullable = true });
     options.SchemaFilter<TimeSpanNullableSchemaFilter>();
 });
